@@ -29,3 +29,4 @@ services:
       - '8080:8080'
     volumes:
       - '../archivist-web:/archivist-web'
+      - /archivist-web/node_modules
