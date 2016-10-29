@@ -12,21 +12,21 @@ services:
 
   api:
     depends_on:
-      - 'mongodb'
+      - mongodb
     build: ../archivist-api/
     ports:
-      - '3000:3000'
+      - 3000:3000
     environment:
       - DOCKERIZED=true
     volumes:
-      - '../archivist-api:/archivist-api'
+      - ../archivist-api:/archivist-api
 
   web:
     depends_on:
-      - 'api'
+      - api
     build: ../archivist-web/
     ports:
-      - '8080:8080'
+      - 8080:8080
     volumes:
-      - '../archivist-web:/archivist-web'
+      - ../archivist-web:/archivist-web
       - /archivist-web/node_modules
