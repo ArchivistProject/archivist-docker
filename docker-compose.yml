@@ -18,7 +18,10 @@ services:
       - 3000:3000
     environment:
       - DOCKERIZED=true
+      - RAILS_ENV=development
     volumes:
+      - /archivist-api/tmp
+      - /tmp
       - ../archivist-api:/archivist-api
 
   web:
