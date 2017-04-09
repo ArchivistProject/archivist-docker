@@ -3,10 +3,9 @@ version: '2'
 services:
   mongodb:
     image: mongo:3.2
-    # TODO: mongod --smallfiles?
     command: mongod
-    ports:
-      - 27017:27017
+    networks:
+      internal: {ipv4_address: 172.16.1.5}
     volumes:
       - ../archivist-api/db/mongo:/data
 
@@ -14,8 +13,8 @@ services:
     depends_on:
       - mongodb
     build: ../archivist-api/
-    ports:
-      - 3000:3000
+    networks:
+      internal: {ipv4_address: 172.16.1.9}
     environment:
       - DOCKERIZED=true
       - RAILS_ENV=development
@@ -24,12 +23,40 @@ services:
       - /tmp
       - ../archivist-api:/archivist-api
 
-  web:
+  pub_haproxy:
     depends_on:
       - api
+    build: ./haproxy/
+    volumes:
+      - ./haproxy/config-public:/haproxy-data
+    ports:
+      - 4000:80
+    networks:
+      external: {ipv4_address: 172.16.0.12}
+      internal: {ipv4_address: 172.16.1.12}
+
+  web:
     build: ../archivist-web/
     ports:
       - 8080:8080
+    networks:
+      external: {ipv4_address: 172.16.0.25}
+      internal: {ipv4_address: 172.16.1.25}
     volumes:
-      - ../archivist-web:/archivist-web
       - /archivist-web/node_modules
+      - ../archivist-web:/archivist-web
+
+networks:
+  external:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.0.0/24
+  internal:
+    driver: bridge
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.1.0/24
